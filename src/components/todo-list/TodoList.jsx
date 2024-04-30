@@ -1,3 +1,5 @@
+import TodoItem from "../todo-item/TodoItem";
+
 function TodoList({ todos, deleteTodoFn, handleTodoCompleted }) {
 
     return (
@@ -5,24 +7,11 @@ function TodoList({ todos, deleteTodoFn, handleTodoCompleted }) {
           {
             todos.map(todo => {
               return (
-                <li className="todo-item" key={todo.id}>
-
-                  <div className="todo-left">
-                    <input  type="checkbox" 
-                            defaultChecked={todo.completed} 
-                            className='todo-checkbox'
-                            onChange={() => handleTodoCompleted(todo.id)}        
-                    />
-                            
-
-                    <span className={`todo-text ${todo.completed ? 'done' : ''}`}>
-                      {todo.text}
-                    </span>  
-                  </div>
-
-                  <button className='todo-delete' onClick={ () => deleteTodoFn(todo.id) }>❌</button>
-
-                </li>
+                <TodoItem key={todo.id}
+                          todo={todo}
+                          handleTodoCompleted={handleTodoCompleted}
+                          deleteTodoFn={deleteTodoFn}  
+                />
               )
             })
           }

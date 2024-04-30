@@ -27,6 +27,12 @@
       border: 1px solid yellowgreen;
     };
   }
+  
+  .input-error {
+    font-size: .75rem;
+    line-height: 1;
+    color: crimson;
+  }
 }
 
 .todo-list-container {

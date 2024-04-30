@@ -1,22 +1,25 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import './App.css';
 import TodoList from './components/todo-list/TodoList';
 
-const TODO_LIST = [
-  { id: 1, text: 'Tarea 1', completed: false },
-  { id: 2, text: 'Tarea 2', completed: true },
-  { id: 3, text: 'Tarea 3', completed: false },
-  { id: 4, text: 'Tarea 4', completed: true },
-  { id: 5, text: 'Tarea 5', completed: false },
-]
 
 function App() {
-  const [ todos, setTodos ] = useState(TODO_LIST) 
+  const [ todos, setTodos ] = useState(
+    JSON.parse(localStorage.getItem("savedTodos")) || []
+  );
+
+  const [ inputError, setInputError ] = useState(false);
+  
+  const inputRef = useRef();
 
   function deleteTodo(id) {
     // Borrar el elemento con el id indicado
     const nuevoArray = todos.filter(todo => todo.id !== id)
+
     setTodos(nuevoArray)
+
+    updateLocalStorage(nuevoArray)
+    
   }
 
   function handleAddTodo(evento) {
@@ -25,6 +28,7 @@ function App() {
       //Tomar el valor del input 
       // Generar una neuva tarea
       // id: todos.at(-1).id
+      
       const newTodo = {
         id: crypto.randomUUID(),
         text: evento.target.value,
@@ -34,12 +38,44 @@ function App() {
       // const nuevoArray = [ ...todos, newTodo ];
 
       // nuevoArray.push(newTodo);
-      setTodos( [ ...todos, newTodo ] )
+      setTodos( [ ...todos, newTodo ] );
+
+      setInputError(false)
+      
+      updateLocalStorage([ ...todos, newTodo ])
+
+      inputRef.current.value = "";
+      // inputRef.current.focus();
+    } else if(evento.key === "Enter") {
+      //mostrar el mensaje de error
+      setInputError(true)
     }
   }
 
   function handleTodoCompleted(id) {
-    console.log(id)
+
+    // const nuevoArrayShort = todos.map(todo => todo.id === id ? { ...todo, completed: !todo.completed } : todo)
+
+    // Llammamos al backend update
+    // Volver a llamar todos los todos con un GET
+
+    const nuevoArray = todos.map(todo => {
+
+      if(todo.id === id) {
+        todo.completed = !todo.completed;
+      }
+
+      return todo;
+
+    })
+
+    setTodos(nuevoArray)
+    updateLocalStorage(nuevoArray)
+    
+  }
+
+  function updateLocalStorage(array) {
+    localStorage.setItem("savedTodos", JSON.stringify(array))
   }
 
 
@@ -51,7 +87,10 @@ function App() {
       <hr />
       <div className="input-container">
         <label htmlFor="">Agregar tarea</label>
-        <input type="text" onKeyUp={handleAddTodo} />
+        <input type="text" onKeyUp={handleAddTodo} ref={inputRef} />
+
+        {  inputError && <div className="input-error">Error en el input</div>  }
+
       </div>
 
       <div className="todo-list-container">
